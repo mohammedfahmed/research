@@ -1,0 +1,47 @@
+clc;clear;
+V=1;
+phi=-pi:.01:pi;
+R=3*sqrt(V);
+
+N=16;
+N=1024;
+[P_u,P_g]=BeamPattern_ug_eqn(N,R,phi);%[P_u,P_g]=bfwsn_ug_eqn(N,V,phi);
+y4=10*log10(abs(P_g));
+x1=phi*180/pi;
+
+figure1 = figure;
+%% Create axes
+% axes1 = axes('XTick',[-180 -120 -60 0 60 120 180],'Parent',figure1);
+% xlim(axes1,[-180 180]);
+legend('Uniform','Gaussian','Location','NorthEast')
+xlabel('Angle \phi [degree]');
+ylabel('Power [dB]');
+box('on');
+grid('on');
+hold('all');
+plot(x1,y4,'k','LineWidth',1)
+xlim([0 60]);
+
+plot(x1,-3*ones(1,length(x1)),'k--','LineWidth',1)
+plot(x1,-27*ones(1,length(x1)),'k--','LineWidth',1)
+
+plot(7.357*ones(1,36),-35:0,'k-.','LineWidth',1)
+plot(24*ones(1,36),-35:0,'k-.','LineWidth',1)
+
+
+
+% Create doublearrow
+annotation(figure1,'doublearrow',[0.775 0.775],...
+    [0.294238095238095 0.219047619047619]);
+
+% Create doublearrow
+annotation(figure1,'doublearrow',[0.775 0.773214285714286],...
+    [0.920428571428571 0.852380952380952]);
+
+% Create doublearrow
+annotation(figure1,'doublearrow',[0.128571428571429 0.223214285714286],...
+    [0.575190476190476 0.573809523809524]);
+
+% Create arrow
+annotation(figure1,'arrow',[0.894642857142857 0.4375],...
+    [0.573809523809524 0.573809523809524]);

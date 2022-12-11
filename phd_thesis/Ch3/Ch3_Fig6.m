@@ -1,0 +1,123 @@
+% Paper: M.F.A. Ahmed and S.A. Vorobyov, "Collaborative beamforming for
+% wireless sensor networks with Gaussian distributed sensor nodes," IEEE
+% Trans. Wireless Communications, vol. 8, no. 2, pp.638-643, Feb. 2009.
+% Fig 1: The normalized directivity (Dav / N) and the lower bound on the
+% normalized directivity (Dav^* / N) for both uniform and Gaussian spatial
+% distributions: N = 16.
+% 
+% 
+% 
+% N : Number of sensor nodes.
+% R : Cluster radius.
+% V : Vairiance of the Gaussian spatial distribution corresponding to
+% cluster radius R.
+% phi : The azimuth angle.
+% alpha : Defined for Uniform and Gaussian spatial distributions.
+% P : Beampattern.
+% DirectionOfBS : Direction Of BS/AP.
+% Dlb : The lower bound on the normalized directivity.
+% Dav : The normalized directivity.
+
+clc;clear;
+
+N = 16;
+RR = [1:10 12:2:50];
+VV = (RR/3).^2;
+phi = -pi:.01:pi;
+DirectionOfBS = 0;
+
+for n = 1:length(VV)
+    
+    V=VV(n);
+    R=RR(n);
+    
+    
+    % - - - The lower bound on the normalized directivity (Dav^* / N) - - -
+    
+    
+    alpha_u = 4*pi*R*sin(phi./2);
+    P_u = abs((1/N)+(1-(1/N))*(abs( 2*(besselj(1,alpha_u))./alpha_u )).^2);
+    
+    alpha_g = 4*pi*sin(phi./2);
+    P_g = abs((1/N)+(1-(1/N))*((abs(  exp(-V*(alpha_g.^2)./2 ) )).^2));
+    
+    
+    Dlb_u(n) = ((2*pi)/(2*pi*mean(P_u)))/N;
+    Dlb_g(n) = ((2*pi)/(2*pi*mean(P_g)))/N;
+    
+    
+    
+    % - - - The normalized directivity (Dav / N)  - - -
+    
+    for cntr=1:100
+        
+        
+        [x,y]=GenWSN(N,R,'u');
+        P_u = BeamPattern(x,y,DirectionOfBS,phi);
+        Dav_u_(cntr)=(2*pi)/(2*pi*mean(P_u));
+        
+        
+        [x,y]=GenWSN(N,R,'g');
+        P_g = BeamPattern(x,y,DirectionOfBS,phi);
+        Dav_g_(cntr)=(2*pi)/(2*pi*mean(P_g));
+        
+    end
+    
+    Dav_u(n)=(mean(Dav_u_))/N;
+    Dav_g(n)=(mean(Dav_g_))/N;
+    
+end
+
+%save Ch3_Fig6
+
+%% Create figure
+figure1 = figure;
+
+
+%% Create axes
+axes1 = axes(...
+    'Parent',figure1);
+xlabel(axes1,'Normalized Radius R/\lambda = 3\sigma');
+ylabel(axes1,'Normalized Directivity');
+grid(axes1,'on');
+hold(axes1,'all');
+
+%% Create plot
+plot1 = plot(...
+    RR,Dav_u,...
+    'LineStyle','none',...
+    'Color','k',...
+    'Marker','x',...
+    'Parent',axes1,...
+    'DisplayName','D_{av}/N - Uniform');
+
+%% Create plot
+plot3 = plot(...
+    RR,Dlb_u,...
+    'LineStyle','-.',...
+    'Color','k',...
+        'Parent',axes1,...
+    'DisplayName','D_{av}^{*}/N - Uniform');
+
+%% Create plot
+plot4 = plot(...
+    RR,Dlb_g,...
+    'LineStyle','-',...
+ 'Color','k',...
+          'Parent',axes1,...
+    'DisplayName','D_{av}^{*}/N - Gaussian');
+%% Create plot
+plot2 = plot(...
+    RR,Dav_g,...
+    'LineStyle','none',...
+    'Color','k',...
+    'Marker','x',...
+    'Parent',axes1,...
+    'DisplayName','D_{av}/N - Gaussian');
+
+%% Create legend
+legend1 = legend(...
+    axes1,{'D_{av}/N - Simulations','D_{av}^{*}/N - Uniform','D_{av}^{*}/N - Gaussian'},...
+    'Location','SouthEast');
+
+box on
